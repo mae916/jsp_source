@@ -21,7 +21,7 @@ public class Member {
 		if (member == null) 
 			return false;
 		
-		String memPw = BCrypt.hashpw(member.getMemPw(), BCrypt.gensalt(10)); // bcrypt 때문에 따로 빼준것
+		String memPw = BCrypt.hashpw(member.getMemPw(), BCrypt.gensalt(10));
 		
 		String sql = "CALL InsertMember(?, ?, ?)";
 		try (Connection conn = DB.getConnection();
@@ -67,26 +67,55 @@ public class Member {
 		
 		return list;
 	}
-
+	
 	/**
 	 * 회원 삭제 
 	 * 
-	 * @param memId
+	 * @param memId 회원 아이디 
 	 * @return 삭제 성공 true
 	 */
 	public boolean deleteMember(String memId) {
 		
 		String sql = "CALL DeleteMember(?)";
-		try (Connection conn = DB.getConnection();
+		try(Connection conn = DB.getConnection();
 			CallableStatement cstmt = conn.prepareCall(sql)) {
-			cstmt.setString(1,memId);
-			int rs = cstmt.executeUpdate(); // 반영된 투플의 갯수
-			if(rs > 0)
+			cstmt.setString(1, memId);
+			int rs = cstmt.executeUpdate();  // 반영된 투플의 갯수 
+			if (rs > 0) 
 				return true;
 			
 		} catch (SQLException | ClassNotFoundException e) {
 			e.printStackTrace();
-			// 로그기록
+			// 로그 기록
+			return false;
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * 로그인 처리 
+	 * 
+	 * @param memId 아이디 
+	 * @param memPw 비밀번호 
+	 * @return 로그인 성공 true
+	 */
+	public boolean login(String memId, String memPw) {
+		
+		String sql = "SELECT * FROM member2 WHERE memId = ?";
+		try(Connection conn = DB.getConnection();
+			PreparedStatement pstmt = conn.prepareStatement(sql)) {
+			pstmt.setString(1, memId);
+			
+			ResultSet rs = pstmt.executeQuery();
+			if (rs.next()) { 
+				String hash = rs.getString("memPw");
+				return BCrypt.checkpw(memPw, hash);
+			}
+			
+		} catch (SQLException | ClassNotFoundException e) {
+			// 로그 기록 ....
+			
 			return false;
 		}
 		
