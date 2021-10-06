@@ -111,14 +111,14 @@ public class SiteMainFilter implements Filter {
 	 * @return true - 팝업, false - 일반 페이지
 	 */
 	public boolean isPopup(ServletRequest request) {
-		//getRequestURI는 (HttpServlet에 있기 때문에 ServletRequest로 가려면 형변환 해줘야함.
 		if (request instanceof HttpServletRequest) {
-			HttpServletRequest req = (HttpServletRequest)request; // 다운 캐스팅(형변환)  
+			HttpServletRequest req = (HttpServletRequest)request;
 			String URI = req.getRequestURI();
 			if (URI.indexOf("/popup") != -1) { // URI 경로에 popup이 포함된 경우  
 				return true;
 			}
 		}
+		
 		
 		return false;
 	}

@@ -1,8 +1,4 @@
 <%@ page contentType="text/html; charset=utf-8" %>
-<%
-	String siteURL = (String)request.getAttribute("siteURL");
-%>
-<script src="<%=siteURL%>/resources/js/form.js"></script>
 <form name='writeFrm' method="post" action="write" target='ifrmHidden' autocomplete='off'>
 	<dl>
 		<dt>제목</dt>
@@ -26,3 +22,13 @@
 	<input type="reset" value="취소하기">
 	<input type="submit" value="작성하기">
 </form>
+<script>
+$(function() {
+	CKEDITOR.replace("content");	
+	CKEDITOR.config.height = 300;
+	
+	$(".addImage").click(function() {
+		layer.popup("popup_upload", 350, 350);	
+	});
+});
+</script>
