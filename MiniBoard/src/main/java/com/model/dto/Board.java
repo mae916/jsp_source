@@ -6,9 +6,9 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 
 /**
- * 게시판 bean 클래스
+ * 게시판 Bean 클래스 
+ *
  */
-
 public class Board {
 	private int idx; // 게시글 번호
 	private String poster; // 작성자
@@ -16,16 +16,16 @@ public class Board {
 	private String content; // 게시글 내용
 	private String regDt; // 게시글 등록일자
 	
-	public Board() {} // 밑에 매개변수가 있는 생성자가 있으면 기본 생성자는 안생기고, 매개변수가 있는 생성자가 없으면 기본생성자가 생긴다.
+	public Board() {}
 	
 	public Board(ResultSet rs) throws SQLException {
-		if(rs != null) {
+		if (rs != null) {
 			idx = rs.getInt("idx");
 			poster = rs.getString("poster");
 			subject = rs.getString("subject");
 			content = rs.getString("content");
-			Timestamp date = rs.getTimestamp("regDt"); // 2021.10.05 11:23:25
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss"); // 원하는 형식으로 변경
+			Timestamp date = rs.getTimestamp("regDt");
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
 			regDt = sdf.format(date);
 		}
 	}
@@ -76,6 +76,5 @@ public class Board {
 	
 	public void setRegDt(String regDt) {
 		this.regDt = regDt;
-	}
-	
+	}	
 }

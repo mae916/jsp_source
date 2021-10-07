@@ -12,13 +12,14 @@ import com.model.dao.BoardDAO;
 import com.model.dto.Board;
 
 public class ListController extends HttpServlet {
-	
+
 	private static final long serialVersionUID = -1L;
+	
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		BoardDAO dao = new BoardDAO();
-		ArrayList<Board>list = dao.getList();
+		ArrayList<Board> list = dao.getList();
 		request.setAttribute("list", list);
 		
 		RequestDispatcher rd = request.getRequestDispatcher("/board/list.jsp");

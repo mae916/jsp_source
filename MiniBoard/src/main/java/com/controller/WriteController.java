@@ -10,7 +10,7 @@ import java.io.PrintWriter;
 
 import com.model.dao.BoardDAO;
 
-/**
+/***
  * 게시글 작성 컨트롤러(서블릿)
  * 
  * GET 접근 - 게시글 작성 양식 (doGet)
@@ -34,15 +34,15 @@ public class WriteController extends HttpServlet {
 	 */
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.setContentType("text/html;charset=utf-8");
+		response.setContentType("text/html; charset=utf-8");
+		
 		PrintWriter out = response.getWriter();
 		BoardDAO dao = new BoardDAO();
 		int idx = dao.write(request);
-		if (idx > 0) { //게시글 등록 성공 -> 게시글 보기 페이지로 이동
-			out.print("<script>parent.location.href='view?idx="+idx+"';</script>");
+		if (idx > 0) { // 게시글 등록 성공 -> 게시글 보기 페이지로 이동 
+			out.print("<script>parent.location.href='view?idx="+ idx + "';</script>");
 		} else { // 게시글 등록 실패
 			out.print("<script>alert('게시글 등록 실패!');</script>");
 		}
-		
 	}
 }

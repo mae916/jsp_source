@@ -1,5 +1,5 @@
 <%@ page contentType="text/html; charset=utf-8" %>
-<jsp:useBean id="member" class="com.dto.MemberBean" />
+<jsp:useBean id="member" class="com.model.dto.MemberBean" />
 <%
 	member.setId(20210929);
 	member.setName("이름1");

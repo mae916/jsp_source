@@ -12,7 +12,8 @@ import com.model.dao.BoardDAO;
 import com.model.dto.Board;
 
 /**
- * 게시글 보기
+ * 게시글 보기 
+ *
  */
 public class ViewController extends HttpServlet {
 	
@@ -21,10 +22,9 @@ public class ViewController extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("text/html; charset=utf-8");
-		PrintWriter out =response.getWriter();
-		
-		// 게시글 번호가 없으면 메세지 출력 -> 게시글 목록 이동
-		if(request.getParameter("idx") == null) {
+		PrintWriter out = response.getWriter();
+		// 게시글 번호가 없으면 메세지 출력 -> 게시글 목록 이동 
+		if (request.getParameter("idx") == null) {
 			out.print("<script>alert('잘못된 접근을 하셨습니다.');location.href='list';</script>");
 			return;
 		}
