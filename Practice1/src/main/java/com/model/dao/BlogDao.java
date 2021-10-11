@@ -7,9 +7,9 @@ import javax.servlet.http.*;
 
 public class BlogDao {
 	
-	public int write(HttpServletRequest request) {
+	public int write(HttpServletRequest request) throws SQLException {
 		int idx = 0;
-		String sql = "INSERT INTO Blog (Writer, subject, content) VALUES(?,?,?)";
+		String sql = "INSERT INTO Blog (Writer, subject, content) VALUES(?, ?, ?)";
 		try(Connection conn = DriverManager.getConnection(sql);
 			PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 			
@@ -17,5 +17,6 @@ public class BlogDao {
 		
 		
 		
+		return idx;
 	}
 }
