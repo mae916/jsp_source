@@ -69,6 +69,11 @@ public class CommonFilter implements Filter {
 					return false;
 				}
 			}
+			
+			/** 확장자가 .jsp로 끝나는 경로는 제외 */ // paging.js에 url에서 paging.jsp의 iframe의 header 등이 추가 되어서 body가 추가 된것. jsp확장자를 걸러주면됨.
+			if (URI.indexOf(".jsp") != -1) {
+				return false;
+			}
 		}
 		
 		return true;

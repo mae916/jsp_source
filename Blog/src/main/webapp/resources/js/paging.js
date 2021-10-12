@@ -17,6 +17,7 @@ function getBlog() {
 		data : { page : page },
 		dataType :  "html",
 		success : function (res) {
+			console.log(res);
 			const st = $("#blog_post").height();
 			if (res.trim() == "") {
 				$("#button").remove();

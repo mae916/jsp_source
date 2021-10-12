@@ -4,21 +4,22 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class Member {
-	private int memNo; //회원번호
-	private String memId; // 회원아이디
-	private String memPw; //회원 비밀번호
-	private String memNm; //회원명
+	
+	private int memNo; // 회원번호
+	private String memId; // 회원 아이디
+	private String memPw; // 회원 비밀번호
+	private String memNm; // 회원명
 	private String regDt; // 가입일
 	
 	public Member() {}
 	
-	public Member(ResultSet rs) throws SQLException {
+	public Member(ResultSet rs) throws SQLException { // rs에 다 넣어 놨기 때문에 다른 클래스에서 사용할때 rs 만 호출하면 됨.
 		this(
-		rs.getInt("memNo"),
-		rs.getString("memId"),
-		rs.getString("memPw"),
-		rs.getString("memNm"),
-		rs.getString("regDt")
+			rs.getInt("memNo"),
+			rs.getString("memId"),
+			rs.getString("memPw"),
+			rs.getString("memNm"),
+			rs.getString("regDt")
 		);
 	}
 	
@@ -68,5 +69,5 @@ public class Member {
 	
 	public void setRegDt(String regDt) {
 		this.regDt = regDt;
-	}
+	}	
 }

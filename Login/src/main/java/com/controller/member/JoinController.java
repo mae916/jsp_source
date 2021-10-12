@@ -33,7 +33,11 @@ public class JoinController extends HttpServlet {
 		PrintWriter out = response.getWriter();
 		try {
 		MemberDao dao = new MemberDao();
-		dao.join(request);
+		boolean result = dao.join(request);
+		if (!result) { //회원가입 실패
+			throw new AlertException("회원가입 실패!");
+		}
+		out.print("<script>parent.location.href='login';</script>"); //parent.location.href 자식에서 부모로 이동하는것
 		} catch(AlertException e) {
 			out.print("<script>alert('" + e.getMessage() + "');</script>");
 			return;

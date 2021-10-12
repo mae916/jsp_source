@@ -12,6 +12,7 @@
 	BlogDao dao = new BlogDao();
 	ArrayList<Blog> list = dao.getList(p, 5);
 %>
+1111111
 <c:set var="list" value="<%=list%>" />
 <c:forEach var="blog" items="${list}">
 	<div class="post_content" style="border-bottom: 1px solid gray; padding: 10px; margin-bottom: 20px;">
