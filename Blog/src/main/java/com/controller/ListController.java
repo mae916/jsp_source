@@ -18,11 +18,22 @@ public class ListController extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
+		response.setContentType("text/html; charset=utf-8");
 		BlogDao dao = new BlogDao();
-		ArrayList<Blog> list = dao.getList();
+		int page = 1;
+		if (request.getParameter("page") != null) {
+			page = Integer.parseInt(request.getParameter("page"));
+		}
+		
+		ArrayList<Blog> list = dao.getList(page, 5);
 		request.setAttribute("list", list);
 		
-		RequestDispatcher rd = request.getRequestDispatcher("/blog/list.jsp");
+		String filePath = "/blog/list.jsp";
+		if (request.getParameter("isAjax") != null) {
+			filePath = "/blog/_list.jsp";
+		}
+		
+		RequestDispatcher rd = request.getRequestDispatcher(filePath);
 		rd.include(request, response);
 	}
 }

@@ -74,6 +74,11 @@ public class CommonFilter implements Filter {
 			if (URI.indexOf(".jsp") != -1) {
 				return false;
 			}
+			
+			/** isAjax로 GET 또는 POST로 데이터가 넘어온 경우는 제외 */
+			if (req.getParameter("isAjax") != null) {
+				return false;
+			}
 		}
 		
 		return true;

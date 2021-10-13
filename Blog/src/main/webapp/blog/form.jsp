@@ -8,29 +8,16 @@
 %>
 <c:set var="blog" value="<%=blog%>" />
 <script src="<%=siteURL%>/resources/js/form.js"></script>
-<form name='writeFrm' method="post" action="write" target='ifrmHidden' autocomplete='off'>
+<form class="write-form" name='writeFrm' method="post" action="write" target='ifrmHidden' autocomplete='off'>
 	<c:if test='${blog != null}'>
 	<input type='hidden' name='idx' value='${blog.idx}'/>
 	</c:if>
-	<dl>
-		<dt>제목</dt>
-		<dd>
-			<input type="text" name="subject" value="<c:out value='${blog.subject}' />">
-		</dd>
-	</dl>
-	<dl>
-		<dt>작성자</dt>
-		<dd>
-			<input type="text" name="writer" value="<c:out value='${blog.writer}' />">
-		</dd>
-	</dl>
-	<dl>
-		<dt>내용</dt>
-		<dd>
+		<div class="box">
+			<input type="text" name="subject" placeholder="제목" value="<c:out value='${blog.subject}' />">
+			<input type="text" name="writer" placeholder="작성자" value="<c:out value='${blog.writer}' />">
+		</div>
 			<textarea id='content' name="content" width="700" height="500"><c:out value="${blog.content}" /></textarea>
 			<span class='addImage'>[이미지 추가]</span>
-		</dd>
-	</dl>
 	<input type="reset" value="취소하기">
 	<c:choose>
 		<c:when test='${blog == null}'>
