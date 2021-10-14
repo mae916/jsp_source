@@ -22,7 +22,7 @@ import com.models.dto.*;
  * 네이버 아이디로 로그인 
  *
  */
-public class NaverLogin extends SocialLogin { //정적 변수를 만들어주는 이유; 정적 변수로 만들어 주면 인스턴스를 만들지 않아도 필터로 데이터가 공유 되기 때문
+public class NaverLogin extends SocialLogin {
 	
 	private static String clientId; // 네이버에서 발급받은 Client ID
 	private static String clientSecret; // 네이버에서 발급받은 Secret 
@@ -106,8 +106,8 @@ public class NaverLogin extends SocialLogin { //정적 변수를 만들어주는
 		sb.append(code);
 		sb.append("&state=");
 		sb.append(state);
-		
 		/** 요청 URL 생성 E */
+		
 		String apiURL = sb.toString();
 		JSONObject result = httpRequest(apiURL);
 		String accessToken = null;
