@@ -9,8 +9,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import com.models.dao.MemberDao;
-import com.models.dto.Member;
 import com.exception.AlertException;
+
+import com.models.dto.*;
 import com.snslogin.*;
 
 /**
@@ -24,14 +25,17 @@ public class JoinController extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("text/html; charset=utf-8");
 		
-		NaverLogin naver = new NaverLogin();
+		SocialLogin naver = new NaverLogin();
+		
 		Member member = naver.getSocialUserInfo(request);
 		boolean isSocialJoin = false;
-		if (member != null) { // 네이버 로그인으로 회원 가입 유입된 경우 
+		if (member != null) {
 			isSocialJoin = true;
 		}
+		
 		request.setAttribute("isSocialJoin", isSocialJoin);
 		request.setAttribute("member", member);
+		
 		
 		RequestDispatcher rd = request.getRequestDispatcher("/member/form.jsp");
 		rd.include(request, response);
@@ -44,9 +48,9 @@ public class JoinController extends HttpServlet {
 		response.setContentType("text/html; charset=utf-8");
 		PrintWriter out = response.getWriter();
 		try {
-			NaverLogin naver = new NaverLogin();
+			SocialLogin naver = new NaverLogin();
 			Member socialMember = naver.getSocialUserInfo(request);
-		
+			
 			MemberDao dao = new MemberDao();
 			boolean result = dao.join(request);
 			if (!result) { // 회원가입 실패 
@@ -63,3 +67,8 @@ public class JoinController extends HttpServlet {
 		}
 	}
 }
+
+
+
+
+

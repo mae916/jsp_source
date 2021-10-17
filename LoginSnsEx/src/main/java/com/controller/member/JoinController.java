@@ -10,8 +10,8 @@ import java.io.PrintWriter;
 
 import com.models.dao.MemberDao;
 import com.models.dto.Member;
+import com.snslogin.NaverLogin;
 import com.exception.AlertException;
-import com.snslogin.*;
 
 /**
  * 회원 가입 
@@ -19,20 +19,21 @@ import com.snslogin.*;
  */
 public class JoinController extends HttpServlet {
 	
+
 	/** 회원가입 양식 */
 	@Override 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("text/html; charset=utf-8");
 		
 		NaverLogin naver = new NaverLogin();
-		Member member = naver.getSocialUserInfo(request);
-		boolean isSocialJoin = false;
-		if (member != null) { // 네이버 로그인으로 회원 가입 유입된 경우 
-			isSocialJoin = true;
+		Member member = naver.getSnsMemberData(request);
+		boolean isSnsJoin = false;
+		if (member != null) { 
+			isSnsJoin = true;
 		}
-		request.setAttribute("isSocialJoin", isSocialJoin);
-		request.setAttribute("member", member);
 		
+		request.setAttribute("isSnsJoin", isSnsJoin);
+		request.setAttribute("member", member);
 		RequestDispatcher rd = request.getRequestDispatcher("/member/form.jsp");
 		rd.include(request, response);
 	}
@@ -45,16 +46,17 @@ public class JoinController extends HttpServlet {
 		PrintWriter out = response.getWriter();
 		try {
 			NaverLogin naver = new NaverLogin();
-			Member socialMember = naver.getSocialUserInfo(request);
-		
+			Member snsMember = naver.getSnsMemberData(request);
+			
 			MemberDao dao = new MemberDao();
 			boolean result = dao.join(request);
-			if (!result) { // 회원가입 실패 
-				throw new AlertException("회원가입 실패!");
-			}
-			if (socialMember == null) { // 일반회원은 로그인 페이지
+			
+			if (!result) {
+				throw new AlertException("회원가입을 실패하였습니다.");
+			}	
+			if (snsMember == null) {
 				out.print("<script>parent.location.href='login';</script>");
-			} else { // 소셜 회원 가입 완료 후 - 자동 로그인 -> 메인페이지
+			} else {
 				out.print("<script>parent.location.href='../main';</script>");
 			}
 		} catch (AlertException e) {
@@ -63,3 +65,8 @@ public class JoinController extends HttpServlet {
 		}
 	}
 }
+
+
+
+
+

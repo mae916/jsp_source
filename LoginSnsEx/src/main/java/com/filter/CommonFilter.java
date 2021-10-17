@@ -9,10 +9,11 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.ServletException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 import com.core.DB;
 import com.models.dao.MemberDao;
-import com.snslogin.*;
+import com.snslogin.NaverLogin;
 
 /**
  * 사이트 공통 필터
@@ -25,12 +26,12 @@ public class CommonFilter implements Filter {
 	
 	
 	@Override 
-	public void init(FilterConfig filterConfig) {
-		DB.init(filterConfig);
+	public void init(FilterConfig filterConfig) throws ServletException {
+		DB.init(filterConfig);	
 		
 		try {
 			NaverLogin.init(filterConfig);
-		} catch (Exception e) {
+		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

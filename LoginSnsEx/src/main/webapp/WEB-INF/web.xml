@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <web-app>
-	<servlet>
+	<!-- 서블릿 -->
+		<servlet>
 		<servlet-name>Member Join</servlet-name>
 		<servlet-class>com.controller.member.JoinController</servlet-class>	
 	</servlet>
@@ -16,10 +17,6 @@
 		<servlet-name>Member Login</servlet-name>
 		<url-pattern>/member/login</url-pattern>
 	</servlet-mapping>
-	<servlet>
-		<servlet-name>Main</servlet-name>
-		<servlet-class>com.controller.MainController</servlet-class>
-	</servlet>
 	<servlet>
 		<servlet-name>Logout</servlet-name>
 		<servlet-class>com.controller.member.LogoutController</servlet-class>
@@ -37,28 +34,17 @@
 		<url-pattern>/main</url-pattern>
 	</servlet-mapping>
 	<servlet>
-		<servlet-name>Naver Login</servlet-name>
+		<servlet-name>NaverLogin</servlet-name>
 		<servlet-class>com.controller.NaverLoginController</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>Naver Login</servlet-name>
+		<servlet-name>NaverLogin</servlet-name>
 		<url-pattern>/naverlogin</url-pattern>
 	</servlet-mapping>
+	<!-- 필터 -->
 	<filter>
 		<filter-name>Common</filter-name>
 		<filter-class>com.filter.CommonFilter</filter-class>
-		<init-param>
-			<param-name>NaverClientId</param-name>
-			<param-value>xnLcz5tulL1JdPH1_V5D</param-value>
-		</init-param>
-		<init-param>
-			<param-name>NaverClientSecret</param-name>
-			<param-value>xFihj7qxhw</param-value>
-		</init-param>
-		<init-param>
-			<param-name>NaverCallbackURL</param-name>
-			<param-value>http://localhost:8080/LoginSns2/naverlogin</param-value>
-		</init-param>
 		<init-param>
 			<param-name>DBDriver</param-name>
 			<param-value>com.mysql.cj.jdbc.Driver</param-value>
@@ -73,7 +59,19 @@
 		</init-param>
 		<init-param>
 			<param-name>DBPass</param-name>
-			<param-value>y10l10!8</param-value>
+			<param-value>aA!12345</param-value>
+		</init-param>
+		<init-param>
+			<param-name>NaverClientId</param-name>
+			<param-value>TXG0agd1iDleCmQAaoXh</param-value>
+		</init-param>
+		<init-param>
+			<param-name>NaverClientSecret</param-name>
+			<param-value>vJHgkgLGWc</param-value>
+		</init-param>
+		<init-param>
+			<param-name>NaverCallbackUrl</param-name>
+			<param-value>http://localhost:8080/LoginSnsEx/naverlogin</param-value>
 		</init-param>
 	</filter>
 	<filter-mapping>
@@ -81,3 +79,4 @@
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 </web-app>
+
