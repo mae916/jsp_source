@@ -1,52 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <web-app>
 	<!-- 서블릿 S -->
-	<servlet>
-		<servlet-name>BoardList</servlet-name>
-		<servlet-class>com.controller.board.ListController</servlet-class>
-		<init-param>
-			<param-name>test1</param-name>
-			<param-value>123</param-value>
-		</init-param>
-		<init-param>
-			<param-name>test2</param-name>
-			<param-value>456</param-value>
-		</init-param>
-	</servlet>
-	<servlet>
-		<servlet-name>BoardView</servlet-name>
-		<servlet-class>com.controller.board.ViewController</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>BoardList</servlet-name>
-		<url-pattern>/board/list</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>BoardView</servlet-name>
-		<url-pattern>/board/view</url-pattern>
-	</servlet-mapping>
+	
 	<!-- 서블릿 E -->
 	<!-- 필터 S -->
 	<filter>
-	<filter-name>SiteMain</filter-name>
-	<filter-class>com.filter.SiteMain</filter-class>
-	<!-- 필터 이름과 값 설정하고 SiteMain에서 가지고 오기 -->
+	<filter-name>Common</filter-name>
+	<filter-class>com.filter.CommonFilter</filter-class>
+	<!-- 필터 이름과 값 설정하고 CommonFilter에서 가지고 오기 -->
 	<init-param>
-		<param-name>filter123</param-name> 
-		<param-value>123</param-value>
+		<param-name>status</param-name> 
+		<param-value>service</param-value>
+	</init-param>
+	<init-param>
+		<param-name>logDir</param-name> 
+		<param-value>D:\\logs</param-value>
 	</init-param>
 	</filter>
-	<filter>
-		<filter-name>SiteMain2</filter-name>
-		<filter-class>com.filter.SiteMain2</filter-class>
-	</filter>
-	<filter-mapping>
-  		<filter-name>SiteMain</filter-name>
-		<url-pattern>/board/list</url-pattern>
-		</filter-mapping>
-		<filter-mapping>
-		<filter-name>SiteMain2</filter-name>
-		<url-pattern>/board/view</url-pattern>
-	</filter-mapping>
 	<!-- 필터 E -->
+	<!-- 시큐리티 S -->
+	<security-role>
+		<role-name>manager</role-name>
+	</security-role>
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Admin page</web-resource-name>
+			<url-pattern>/admin/*</url-pattern>
+			<http-method>GET</http-method>
+		</web-resource-collection>
+		<auth-constraint>
+			<description>관리자 접속 사용자</description>
+			<role-name>manager</role-name>			
+		</auth-constraint>
+	</security-constraint>
+	<login-config>
+		<auth-method>FORM</auth-method>
+		<form-login-config>
+			<form-login-page>/ch10/login.jsp</form-login-page>
+			<form-error-page>/ch10/login_failed.jsp</form-error-page>
+		</form-login-config>
+	</login-config>
+<!-- 시큐리티 E -->
+<!-- 예외처리 S -->
+	<error-page>
+		<error-code>404</error-code>
+		<location>/ch11/not_found.jsp</location>
+	</error-page>
+	<error-page>
+		<exception-type>java.lang.NullPointerException</exception-type>
+		<location>/ch11/ex01_error.jsp</location>
+	</error-page>
+<!-- 예외처리 E -->
 </web-app>
