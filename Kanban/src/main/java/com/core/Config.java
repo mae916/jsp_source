@@ -123,19 +123,21 @@ public class Config {
 	 * 
 	 * @return
 	 */
-	public String[] getCss() {
+	public HashSet<String> getCss() {
 		
-		String[] list = null;
+		HashSet<String> list = new HashSet<>();
 		HashMap<String, String> css = (HashMap<String, String>)get("css");
 		Iterator<String> ir = css.keySet().iterator();
 		while(ir.hasNext()) {
 			String URI = ir.next();
 			if (requestURI.indexOf(URI) != -1) {
-				list = css.get(URI).split("||");
-				break;
+				StringTokenizer st = new StringTokenizer(css.get(URI), "||");
+				while(st.hasMoreTokens()) {
+					list.add(st.nextToken());
+				}
 			}
 		}
-		System.out.println(list);
+		
 		return list;
 	}
 	
@@ -143,12 +145,122 @@ public class Config {
 	 * URI 패턴에 따른 JS 파일 목록 
 	 * @return
 	 */
-	public String[] getScripts() {
+	public HashSet<String> getScripts() {
+		HashSet<String> list = new HashSet<>();
+		HashMap<String, String> js = (HashMap<String, String>)get("js");
+		Iterator<String> ir = js.keySet().iterator();
+		while(ir.hasNext()) {
+			String URI = ir.next();
+			if (requestURI.indexOf(URI) != -1) { // URI 포함되어 있다면 
+				StringTokenizer st = new StringTokenizer(js.get(URI), "||");
+				while(st.hasMoreTokens()) {
+					list.add(st.nextToken());
+				}
+			}
+		}
 		
-		return null;
+		return list;
+	}
+	
+	/**
+	 * 헤더, 푸터 addon 경로 
+	 * 
+	 * @param addonType 
+	 * 				 - AddonHeader - 헤더 추가 영역, AddonFooter - 푸터 추가영역 
+	 * @return
+	 */
+	public String getAddon(String addonType) {
+		String addon = null;
+		String commonAddon = null;
+		
+		HashMap<String, String> addons = (HashMap<String, String>)get(addonType);
+		Iterator<String> ir = addons.keySet().iterator();
+		while(ir.hasNext()) {
+			String URI = ir.next();
+			if (URI.equals("*")) { // 공통
+				commonAddon = addons.get(URI);
+			} else { // 별도 패턴 -> 체크 
+				if (requestURI.indexOf(URI) != -1) {
+					addon = addons.get(URI);
+				}
+			}
+		}
+		
+		// 헤더 추가 영역 없는 경우 
+		if (addon != null && addon.equals("none")) {
+			return null;
+		}
+		
+		String type = addonType.equals("AddonHeader")?"header":"footer";
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append("/views/outline/");
+		sb.append(type);
+		sb.append("/inc/");
+		
+		if (addon == null) { // 공통 
+			sb.append(commonAddon);
+		} else { 
+			sb.append(addon);
+		}
+		sb.append(".jsp");
+		
+		return sb.toString();
+	}
+	
+	/**
+	 * 사이트 헤더 영역에 추가될 jsp 경로
+	 * 
+	 * @return
+	 */
+	public String getHeaderAddon() {
+		return getAddon("AddonHeader");
+	}
+	
+	/**
+	 * 사이트 푸터 영역에 추가될 jsp 경로
+	 * 
+	 * @return
+	 */
+	public String getFooterAddon() {
+		return getAddon("AddonFooter");
+	}
+	
+	/**
+	 * 페이지 URI를 가지고 body에 추가할 클래스명
+	 * 	
+	 * @return
+	 */
+	public String getBodyClass() {
+		String rootURL = request.getServletContext().getContextPath();
+		String URI = requestURI.replace(rootURL, "").replace("index.jsp", "");
+		if (URI.equals("/")) { // 메인페이지
+			return "body-main body-index";
+		}
+		
+		
+		StringTokenizer st = new StringTokenizer(URI, "/");
+		StringBuilder sb = new StringBuilder();
+		String prevClassNm = null;
+		
+		while(st.hasMoreTokens()) {
+			String classNm = st.nextToken();
+			if (classNm != null && !classNm.equals("")) {
+				sb.append("body-");
+				if (prevClassNm != null) {
+					sb.append(prevClassNm);
+					sb.append("-");
+				}
+				
+				sb.append(classNm);
+				sb.append(" ");
+				prevClassNm = classNm;
+			}
+		}
+			
+		return sb.toString();
 	}
 }
-
 
 
 
