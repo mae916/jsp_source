@@ -23,40 +23,20 @@ public class DB {
 		return conn;
 	}
 	
-	public static <E extends Dto> ArrayList<E> executeQuery(String sql, ArrayList<Map<String, String>> bindings, E dto) { // E -> Object
+	public static <E extends Dto> ArrayList<E> executeQuery(String sql, ArrayList<DBField> bindings, E dto) { // E -> Object
 		
 		ArrayList<E> list = new ArrayList<>();
-		ArrayList<String> logBindings = new ArrayList<>();
+		ArrayList<String> logBindings = null;
 		
 		try (Connection conn = DB.getConnection();
 			PreparedStatement pstmt = conn.prepareStatement(sql)) {
 			if (bindings != null) {
-				int no = 1;
-				for (Map<String, String> map : bindings) {
-					Iterator<String> ir = map.keySet().iterator();
-					if (ir.hasNext()) {
-						String dataType = ir.next();
-						String value = map.get(dataType);
-						logBindings.add(value); // 바인딩 데이터를 로그로 기록
-						switch(dataType) {
-							case "String" :
-								pstmt.setString(no, value);
-								break;
-							case "Integer" :
-								pstmt.setInt(no, Integer.valueOf(value));
-								break;
-							case "Double" : 
-								pstmt.setDouble(no, Double.valueOf(value));
-								break;
-						}
-					}
-					no++;
-				} // endfor 
-			
+				// 바인딩 처리
+				logBindings = processBinding(pstmt, bindings);
+
 				ResultSet rs = pstmt.executeQuery();
 				while(rs.next()) {
-					dto.setResultSet(rs);
-					list.add(dto);
+					list.add((E)dto.setResultSet(rs));
 				}
 				rs.close();
 				
@@ -76,7 +56,16 @@ public class DB {
 		
 		return list;
 	}
-
+	
+	public static<E extends Dto> E executeQueryOne(String sql, ArrayList<DBField> bindings, E dto) {
+		ArrayList<E> list = executeQuery(sql, bindings, dto);
+		if (list == null || list.size() == 0) {
+			return null;
+		} else {
+			return list.get(0);
+		}
+	}
+	
 	/**
 	 * UPDATE, INSERT, DELETE에서 사용
 	 * 
@@ -86,37 +75,15 @@ public class DB {
 	 * @return int - INSERT인 경우 -> 추가된 증감번호(Primary Key, Auto Increment), 나머지는 - 반영된 투플의 개수
 	 * 		
 	 */
-	public static int executeUpdate(String sql, ArrayList<Map<String,String>> bindings, boolean isReturnGeneratedKey) {
+	public static int executeUpdate(String sql, ArrayList<DBField> bindings, boolean isReturnGeneratedKey) {
 		
 		int rs = 0;
-		ArrayList<String> logBindings = new ArrayList<>();
+		ArrayList<String> logBindings = null;
 		
 		try(Connection conn = getConnection();
 			PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 			
-			int no = 1;
-			for(Map<String, String> map : bindings) {
-				Iterator<String> ir = map.keySet().iterator();
-				if (ir.hasNext()) { // Map은 1개씩만 추가
-					String dataType = ir.next();
-					String value = map.get(dataType);
-					logBindings.add(value);
-					
-					switch(dataType) {
-						case "String" :
-							pstmt.setString(no, value);
-							break;
-						case "Integer" :
-							pstmt.setInt(no, Integer.valueOf(value));
-							break;
-						case "Double" :
-							pstmt.setDouble(no, Double.valueOf(value));
-							break;
-					}
-				}
-				
-				no++;
-			} // endfor
+			logBindings = processBinding(pstmt, bindings);
 			
 			rs = pstmt.executeUpdate();
 			
@@ -146,7 +113,119 @@ public class DB {
 		return rs;
 	}
 	
-	public static int executeUpdate(String sql, ArrayList<Map<String, String>> bindings) {
+	public static int executeUpdate(String sql, ArrayList<DBField> bindings) {
 		return executeUpdate(sql, bindings, false);
+	}
+	
+	/**
+	 * 테이블 + 조건(=)에 따른 개수 
+	 * 
+	 * @param tableName
+	 * @param fields 조건 속성명
+	 * @param bindings
+	 * @return
+	 */
+	public static int getCount(String tableName, String[] fields, ArrayList<DBField> bindings) {
+		int count = 0;
+		
+		ArrayList<String> logBindings = null;
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append("SELECT COUNT(*) cnt FROM ");
+		sb.append(tableName);
+		
+		if (fields != null && fields.length > 0) {
+			boolean isFirst = true;
+			sb.append(" WHERE ");
+			for(String field : fields) {
+				if (!isFirst) {
+					sb.append(" AND ");
+				}
+				sb.append(field);
+				sb.append("= ?");
+				
+				isFirst = false;
+			}
+		} // endif 
+		
+		String sql = sb.toString();
+		try(Connection conn = getConnection();
+			PreparedStatement pstmt = conn.prepareStatement(sql)) {
+			
+			/** 데이터 바인딩 S */
+			if (fields != null && fields.length > 0 && bindings != null) {
+				logBindings = processBinding(pstmt, bindings);
+			}
+			/** 데이터 바인딩 E */
+			ResultSet rs = pstmt.executeQuery();
+			if (rs.next()) {
+				count = rs.getInt("cnt");
+			}
+			rs.close();
+			
+		} catch (SQLException | ClassNotFoundException e) {
+			Logger.log(e);
+		}
+		
+		// SQL 로그 기록
+		sb = new StringBuilder();
+		sb.append("SQL : ");
+		sb.append(sql);
+		sb.append(" / Bindings : ");
+		sb.append(logBindings.toString());
+		sb.append("/ count : ");
+		sb.append(count);		
+		Logger.log(sb, Logger.INFO);
+		
+		return count;
+	}
+	
+	public static int getCount(String tableName) {
+		return getCount(tableName, null, null);
+	}
+	
+	/**
+	 * SQL 바인데이터를 Map 형태로 지정
+	 * 
+	 * @param dataType
+	 * @param data
+	 * @return
+	 */
+	public static DBField setBinding(String dataType, String data) {
+		
+		return new DBField(dataType, data);
+	}
+	
+	/**
+	 * SQL 바인딩 처리 
+	 *  
+	 * @param pstmt
+	 * @param bindings
+	 */
+	public static ArrayList<String> processBinding(PreparedStatement pstmt, ArrayList<DBField> bindings) throws SQLException {
+		
+		ArrayList<String> logBindings = new ArrayList<>(); // 로그용 바인딩 데이터
+		
+		int no = 1;
+		for(DBField binding : bindings) {
+			String dataType = binding.getType();
+			String value = binding.getValue();
+			logBindings.add(value);
+			
+			switch(dataType) {
+				case "String" :
+					pstmt.setString(no, value);
+					break;
+				case "Integer" : 
+					pstmt.setInt(no, Integer.valueOf(value));
+					break;
+				case "Double" :
+					pstmt.setDouble(no, Double.valueOf(value));
+					break;
+			}	
+			no++;
+		}
+		
+		return logBindings;
 	}
 }

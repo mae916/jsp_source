@@ -24,6 +24,7 @@ public class MemberController extends HttpServlet {
 			response.setContentType("text/html; charset=utf-8");
 		} else { // GET이 아닌 경우 -> 유입된 입력 양식 데이터 처
 			response.setCharacterEncoding("utf-8");
+			request.setCharacterEncoding("utf-8");
 		}
 		
 		out = response.getWriter();
@@ -45,6 +46,9 @@ public class MemberController extends HttpServlet {
 				break;
 			case "findpw" : // 비밀번호 찾기
 				findpwController(request, response);
+				break;
+			case "logout" : // 로그아웃 
+				logoutController(request, response);
 				break;
 			default : // 없는 페이지 
 				RequestDispatcher rd = request.getRequestDispatcher("/views/error/404.jsp");
@@ -70,7 +74,14 @@ public class MemberController extends HttpServlet {
 		} else { // 양식 처리
 			MemberDao dao = MemberDao.getInstance();
 			try {
-				dao.join(request);
+				boolean result = dao.join(request);
+				if (!result) { // 가입 실패
+					throw new Exception("가입에 실패하였습니다.");
+				}
+				
+				// 가입 성공 -> 로그인페이지
+				out.printf("<script>parent.location.replace('%s');</script>", "../index.jsp");
+				
 			} catch (Exception e) {
 				response.setContentType("text/html; charset=utf-8");
 				out.printf("<script>alert('%s');</script>", e.getMessage());
@@ -100,7 +111,14 @@ public class MemberController extends HttpServlet {
 	 * @throws IOException
 	 */
 	private void loginController(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
+		MemberDao dao = MemberDao.getInstance();
+		try {
+			dao.login(request);
+			out.printf("<script>parent.location.replace('%s');</script>", "../kanban/work");
+		} catch (Exception e) {
+			Logger.log(e);
+			out.printf("<script>alert('%s');</script>", e.getMessage());
+		}
 	}
 	
 	/**
@@ -125,6 +143,19 @@ public class MemberController extends HttpServlet {
 	 */
 	private void findpwController(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	
+	}
+	
+	/**
+	 * 로그아웃 
+	 * 
+	 * @param request
+	 * @param response
+	 * @throws ServletException
+	 * @throws IOException
+	 */
+	private void logoutController(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		MemberDao dao = MemberDao.getInstance();
+		dao.logout(request);
 	}
 }
 
