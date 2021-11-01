@@ -4,7 +4,7 @@
 	"DB":  { 
 		"Driver": "com.mysql.cj.jdbc.Driver",
 		"Url" : "jdbc:mysql://localhost:3306/kanban",
-		"user" : "kanban", 
+		"user" : "root", 
 		"password" : "aA!12345"
 	},
 	"LogDir" : "D:\\logs",
@@ -17,5 +17,11 @@
 	},
 	"AddonFooter" : {
 		"*" : "common"
+	},
+	
+	"NaverLogin" : {
+	"clientId" : "T7b64kztqhjTWYeSlpga",
+	"secret" : "ecuRc9TkBR",
+	"callbackURL" : "http://localhost:8080/Kanban/member/naver_login"
 	}
  }

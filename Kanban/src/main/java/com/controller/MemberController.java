@@ -6,6 +6,8 @@ import java.io.*;
 
 import com.core.Logger;
 import com.models.member.*;
+import com.models.snslogin.*;
+
 
 /**
  *  /member/* 컨트롤러
@@ -52,6 +54,9 @@ public class MemberController extends HttpServlet {
 			case "logout" : // 로그아웃 
 				logoutController(request, response);
 				break;
+			case "naver_login" : // 네이버 로그인 callback URL
+				naverLoginController(request, response);
+				break;	
 			default : // 없는 페이지 
 				RequestDispatcher rd = request.getRequestDispatcher("/views/error/404.jsp");
 				rd.forward(request, response);
@@ -141,7 +146,10 @@ public class MemberController extends HttpServlet {
 	 * @throws IOException
 	 */
 	private void loginController(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		if (httpMethod.equals("GET")) {
+		if (httpMethod.equals("GET")) { // 네이버 로그인 버튼을 클릭하면 이동할 URL
+			String naverCodeURL = NaverLogin.getInstance().getCodeURL(request);
+			request.setAttribute("naverCodeURL", naverCodeURL);
+			
 			RequestDispatcher rd = request.getRequestDispatcher("/views/main/index.jsp");
 			rd.include(request, response);
 		} else {
@@ -286,6 +294,24 @@ public class MemberController extends HttpServlet {
 		dao.logout(request);
 		PrintWriter out = response.getWriter();
 		out.printf("<script>location.replace('%s');</script>", "../index.jsp");
+	}
+	
+	/**
+	 * 네이버 로그인 Callback URL
+	 * 
+	 * @param request
+	 * @param response
+	 * @throws ServletException
+	 * @throws IOException
+	 */
+	private void naverLoginController(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		NaverLogin naver = NaverLogin.getInstance();
+		try {
+			naver.getAccessToken(request);
+		} catch (Exception e) {
+			Logger.log(e);
+			out.printf("<script>alert('%s');location.replace('../member/login');</script>", e.getMessage());
+		}
 	}
 }
 
