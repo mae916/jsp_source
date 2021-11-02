@@ -16,6 +16,7 @@ public class MainController extends HttpServlet {
 		
 		String naverCodeURL = NaverLogin.getInstance().getCodeURL(request);
 		request.setAttribute("naverCodeURL", naverCodeURL);
+		
 		RequestDispatcher rd = request.getRequestDispatcher("/views/main/index.jsp");
 		rd.include(request, response);
 	}

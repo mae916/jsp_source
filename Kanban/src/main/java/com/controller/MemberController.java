@@ -8,7 +8,6 @@ import com.core.Logger;
 import com.models.member.*;
 import com.models.snslogin.*;
 
-
 /**
  *  /member/* 컨트롤러
  *
@@ -54,9 +53,9 @@ public class MemberController extends HttpServlet {
 			case "logout" : // 로그아웃 
 				logoutController(request, response);
 				break;
-			case "naver_login" : // 네이버 로그인 callback URL
+			case "naver_login" : // 네이버 로그인 Callback URL
 				naverLoginController(request, response);
-				break;	
+				break;
 			default : // 없는 페이지 
 				RequestDispatcher rd = request.getRequestDispatcher("/views/error/404.jsp");
 				rd.forward(request, response);
@@ -76,7 +75,24 @@ public class MemberController extends HttpServlet {
 	 */
 	private void joinController(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		if (httpMethod.equals("GET")) { // 양식 출력 
+			HttpSession session = request.getSession();
+			
 			request.setAttribute("action", "../member/join"); // 양식 처리 경로
+			String socialType = "none";
+			Member socialMember = null;
+			
+			String[] socialTypes = {"naver", "kakao"};
+			for (String type : socialTypes) {
+				if (session.getAttribute(type + "_member") != null) {
+					socialType = type;
+					socialMember = (Member)session.getAttribute(type + "_member");
+					break;
+				}
+			}
+			
+			request.setAttribute("socialType", socialType);
+			request.setAttribute("socialMember", socialMember);
+			
 			RequestDispatcher rd = request.getRequestDispatcher("/views/member/form.jsp");
 			rd.include(request, response);
 		} else { // 양식 처리
@@ -130,6 +146,7 @@ public class MemberController extends HttpServlet {
 			MemberDao dao = MemberDao.getInstance();
 			try {
 				dao.updateInfo(request);
+				out.println("<script>alert('수정되었습니다.');parent.location.reload();</script>");
 			} catch (Exception e) {
 				Logger.log(e);
 				out.printf("<script>alert('%s');</script>", e.getMessage());
@@ -146,7 +163,7 @@ public class MemberController extends HttpServlet {
 	 * @throws IOException
 	 */
 	private void loginController(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		if (httpMethod.equals("GET")) { // 네이버 로그인 버튼을 클릭하면 이동할 URL
+		if (httpMethod.equals("GET")) {
 			String naverCodeURL = NaverLogin.getInstance().getCodeURL(request);
 			request.setAttribute("naverCodeURL", naverCodeURL);
 			
@@ -297,7 +314,7 @@ public class MemberController extends HttpServlet {
 	}
 	
 	/**
-	 * 네이버 로그인 Callback URL
+	 * 네이버 로그인 Callback URL 
 	 * 
 	 * @param request
 	 * @param response
@@ -307,7 +324,25 @@ public class MemberController extends HttpServlet {
 	private void naverLoginController(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		NaverLogin naver = NaverLogin.getInstance();
 		try {
-			naver.getAccessToken(request);
+			String accessToken = naver.getAccessToken(request);
+			naver.getProfile(request, accessToken);
+			
+			/**
+			 *  네이버 소셜 채널로 이미 가입이 완료된 경우 -> 로그인 처리 
+			 *  가입이 안되어 있는 경우 -> 회원 가입 처리 
+			 */
+			if (naver.isJoin(request)) { // 가입되어 있는 경우 
+				boolean result = naver.login(request); // 로그인
+				if (!result) { // 로그인 실패 
+					throw new Exception("네이버 아이디 로그인 실패!");
+				}
+				// 로그인 성공시 작업 요약 
+				out.printf("<script>location.replace('%s');</script>", "../kanban/work");
+			} else { // 미가입
+				// 회원 가입 페이지 이동
+				out.printf("<script>location.replace('%s');</script>", "../member/join");
+			}
+			
 		} catch (Exception e) {
 			Logger.log(e);
 			out.printf("<script>alert('%s');location.replace('../member/login');</script>", e.getMessage());

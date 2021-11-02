@@ -3,7 +3,6 @@
 <%
 	String rootURL = (String)request.getAttribute("rootURL");
 	String naverCodeURL = (String)request.getAttribute("naverCodeURL");
-
 %>
 <c:set var="rootURL" value="<%=rootURL%>" />
 <c:set var="naverCodeURL" value="<%=naverCodeURL%>" />
@@ -26,8 +25,8 @@
 			
 			<input type="submit" value="로그인">
 			<a href="${naverCodeURL}">
-			<img src="${rootURL}/resources/image/naverlogin_btn.png" width="340">	
-			</a>	
+			<img src="${rootURL}/resources/image/naverlogin_btn.png" width="340">
+			</a>
 		</form>
 	</div>
 </main>
