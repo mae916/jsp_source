@@ -1,2 +1,3 @@
 <%@ page contentType="text/html; charset=utf-8" %>
-메인 페이지....
+<main class="layout_width">
+	<button type="button">

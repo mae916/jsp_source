@@ -4,13 +4,14 @@
 	"DB":  { 
 		"Driver": "com.mysql.cj.jdbc.Driver",
 		"Url" : "jdbc:mysql://localhost:3306/kanban",
-		"user" : "kanban", 
+		"user" : "root", 
 		"password" : "aA!12345"
 	},
 	"LogDir" : "D:\\logs",
 	"css": {
 	},
 	"js" : {
+		"/kanban":"kanban"
 	},
 	"AddonHeader" : {
 		"*" : "common"
@@ -19,8 +20,8 @@
 		"*" : "common"
 	},
 	"NaverLogin" : {
-		"clientId" : "9yYsnlPkG6lT28LfJWaH",
-		"secret" : "8B610gp0i5",
+		"clientId" : "T7b64kztqhjTWYeSlpga",
+		"secret" : "ecuRc9TkBR",
 		"callbackURL" : "http://localhost:8080/Kanban/member/naver_login"
 	}
  }

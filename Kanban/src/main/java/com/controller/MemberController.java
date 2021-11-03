@@ -79,15 +79,9 @@ public class MemberController extends HttpServlet {
 			
 			request.setAttribute("action", "../member/join"); // 양식 처리 경로
 			String socialType = "none";
-			Member socialMember = null;
-			
-			String[] socialTypes = {"naver", "kakao"};
-			for (String type : socialTypes) {
-				if (session.getAttribute(type + "_member") != null) {
-					socialType = type;
-					socialMember = (Member)session.getAttribute(type + "_member");
-					break;
-				}
+			Member socialMember = SocialLogin.getSocialMember(request);
+			if (socialMember != null) {
+				socialType = socialMember.getSocialType();
 			}
 			
 			request.setAttribute("socialType", socialType);
@@ -97,6 +91,7 @@ public class MemberController extends HttpServlet {
 			rd.include(request, response);
 		} else { // 양식 처리
 			MemberDao dao = MemberDao.getInstance();
+			Member socialMember = SocialLogin.getSocialMember(request);
 			try {
 				boolean result = dao.join(request);
 				if (!result) { // 가입 실패
@@ -104,7 +99,11 @@ public class MemberController extends HttpServlet {
 				}
 				
 				// 가입 성공 -> 로그인페이지
-				out.printf("<script>parent.location.replace('%s');</script>", "../index.jsp");
+				String redirectUrl = "../index.jsp";
+				if (socialMember != null) { // 소셜 회원 가입은 로그인 처리하므로 작업 요약으로 이동 
+					redirectUrl = "../kanban/work";
+				}
+				out.printf("<script>parent.location.replace('%s');</script>", redirectUrl);
 				
 			} catch (Exception e) {
 				response.setContentType("text/html; charset=utf-8");
@@ -139,6 +138,9 @@ public class MemberController extends HttpServlet {
 		}
 		
 		if (httpMethod.equals("GET")) { // 수정 양식
+			String socialType = member.getSocialType();
+			
+			request.setAttribute("socialType", socialType);
 			request.setAttribute("action", "../member/info");
 			RequestDispatcher rd = request.getRequestDispatcher("/views/member/form.jsp");
 			rd.include(request, response);
@@ -164,6 +166,8 @@ public class MemberController extends HttpServlet {
 	 */
 	private void loginController(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		if (httpMethod.equals("GET")) {
+			SocialLogin.clear(request);
+			
 			String naverCodeURL = NaverLogin.getInstance().getCodeURL(request);
 			request.setAttribute("naverCodeURL", naverCodeURL);
 			
@@ -349,5 +353,3 @@ public class MemberController extends HttpServlet {
 		}
 	}
 }
-
-
