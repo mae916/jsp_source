@@ -5,6 +5,7 @@ import javax.servlet.http.*;
 import java.io.IOException;
 
 import com.core.*;
+import com.models.file.FileInfo;
 import com.models.member.*;
 
 /**
@@ -18,7 +19,7 @@ public class CommonFilter implements Filter {
 	 * 정적 디렉토리(헤더, 푸터가 적용되지 않는 경로)
 	 *    - css, js, image ... 
 	 */
-	private String[] staticDirs = {"resources"};
+	private String[] staticDirs = {"resources", "file"};
 	
 	public void init(FilterConfig config) throws ServletException {
 		
@@ -62,6 +63,10 @@ public class CommonFilter implements Filter {
 		String rootURL = request.getServletContext().getContextPath();
 		request.setAttribute("rootURL", rootURL);
 		
+		/** rootPath */
+		String rootPath = request.getServletContext().getRealPath(".");
+		request.setAttribute("rootPath", rootPath);
+		
 		/** 요청 메서드 + requestURL, Request Encoding 설정 */
 		if (request instanceof HttpServletRequest) {
 			HttpServletRequest req = (HttpServletRequest)request;
@@ -78,7 +83,8 @@ public class CommonFilter implements Filter {
 		/** URL 접속 권한 체크 */
 		AccessController.init(request, response);
 		
-		
+		/** 파일 정보 초기 설정 */
+		FileInfo.init(request);
 		
 		// 헤더 출력
 		if (isPrintOk(request)) {
@@ -152,6 +158,7 @@ public class CommonFilter implements Filter {
 			/** 요청 메서드 GET 방식이 아닌 경우 제외 */
 			String method = req.getMethod().toUpperCase();
 			if (!method.equals("GET") && (outline != null && !outline.equals("print"))) {
+				System.out.println("테스트");
 				return false;
 			}
 			

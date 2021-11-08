@@ -39,9 +39,7 @@ public class DB {
 					list.add((E)dto.setResultSet(rs));
 				}
 				rs.close();
-				
 			}
-			
 		} catch (SQLException | ClassNotFoundException e) {
 			Logger.log(e);
 		} finally {
@@ -95,7 +93,6 @@ public class DB {
 				}
 				gkrs.close();
 			}
-			
 		} catch (SQLException | ClassNotFoundException e) {
 			Logger.log(e);
 		} finally {
@@ -218,6 +215,9 @@ public class DB {
 					break;
 				case "Integer" : 
 					pstmt.setInt(no, Integer.valueOf(value));
+					break;
+				case "Long" :
+					pstmt.setLong(no, Long.valueOf(value));
 					break;
 				case "Double" :
 					pstmt.setDouble(no, Double.valueOf(value));

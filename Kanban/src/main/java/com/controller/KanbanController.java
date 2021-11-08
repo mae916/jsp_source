@@ -1,8 +1,12 @@
 package com.controller;
 
+import java.util.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
-import java.io.IOException;
+import java.io.*;
+
+import com.core.*;
+import com.models.kanban.*;
 
 /**
  *   /kanban 컨트롤러
@@ -11,6 +15,7 @@ import java.io.IOException;
 public class KanbanController extends HttpServlet {
 	
 	private String httpMethod; // 요청 메서드
+	private PrintWriter out;
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
@@ -19,12 +24,13 @@ public class KanbanController extends HttpServlet {
 		
 		httpMethod = request.getMethod().toUpperCase(); // GET, POST, DELETE
 		
+		response.setCharacterEncoding("UTF-8");
+		request.setCharacterEncoding("UTF-8");
 		if (httpMethod.equals("GET")) {
 			response.setContentType("text/html; charset=utf-8");
-		} else { 
-			request.setCharacterEncoding("UTF-8");
 		}
 		
+		out = response.getWriter();
 		switch(mode) {
 			case "work" : // 작업목록
 				workController(request, response);
@@ -50,16 +56,26 @@ public class KanbanController extends HttpServlet {
 	}
 	
 	/** 작업 목록 */
-	private void workController(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {		
+	private void workController(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
 		RequestDispatcher rd = request.getRequestDispatcher("/views/kanban/main.jsp");
 		rd.include(request, response);
 	}
 	
 	/** 작업 등록 */
 	private void addController(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
 		if (httpMethod.equals("POST")) { // 등록 처리 
+			try {
+				KanbanDao dao = KanbanDao.getInstance();
+				dao.add(request);
+			} catch (Exception e) {
+				out.printf("<script>alert('%s');</script>", e.getMessage());
+			}
 			
 		} else { // 등록 양식
+			request.setAttribute("gid", System.currentTimeMillis());
+			
 			RequestDispatcher rd = request.getRequestDispatcher("/views/kanban/form.jsp");
 			rd.include(request, response);
 		}
