@@ -7,6 +7,7 @@ import java.io.*;
 
 import com.core.*;
 import com.models.kanban.*;
+import com.models.file.*;
 
 /**
  *   /kanban 컨트롤러
@@ -44,6 +45,9 @@ public class KanbanController extends HttpServlet {
 			case "remove" : // 작업 제거
 				removeController(request, response);
 				break;
+			case "view" : // 작업 상세보기
+				viewController(request, response);
+				break;
 			default : // 없는 페이지 
 				RequestDispatcher rd = request.getRequestDispatcher("/views/error/404.jsp");
 				rd.forward(request, response);
@@ -57,6 +61,10 @@ public class KanbanController extends HttpServlet {
 	
 	/** 작업 목록 */
 	private void workController(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		KanbanDao dao = KanbanDao.getInstance();
+		ArrayList<Kanban> list = dao.getList();
+		
+		request.setAttribute("list", list);
 		
 		RequestDispatcher rd = request.getRequestDispatcher("/views/kanban/main.jsp");
 		rd.include(request, response);
@@ -68,7 +76,11 @@ public class KanbanController extends HttpServlet {
 		if (httpMethod.equals("POST")) { // 등록 처리 
 			try {
 				KanbanDao dao = KanbanDao.getInstance();
-				dao.add(request);
+				boolean result = dao.add(request);
+				if (!result) {
+					throw new Exception("작업등록 실패하였습니다.");
+				}
+				out.print("<script>parent.location.reload();</script>");
 			} catch (Exception e) {
 				out.printf("<script>alert('%s');</script>", e.getMessage());
 			}
@@ -93,7 +105,46 @@ public class KanbanController extends HttpServlet {
 
 	/** 작업 삭제 */
 	private void removeController(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
+		try {
+			if (request.getParameter("idx") == null) {
+				throw new Exception("잘못된 접근입니다.");
+			}
+			KanbanDao dao = KanbanDao.getInstance();
+			boolean result = dao.delete(request);
+			if (!result) {
+				throw new Exception("삭제 실패하였습니다.");
+			}
+			
+			out.print("<script>parent.location.reload();</script>");
+		} catch (Exception e) {
+			out.printf("<script>alert('%s');</script>", e.getMessage());
+		}
+	}
+	
+	/** 작업 상세보기 */
+	private void viewController(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		try {
+			if (request.getParameter("idx") == null) {
+				throw new Exception("잘못된 접근입니다.");
+			}
+			
+			KanbanDao dao = KanbanDao.getInstance();
+			Kanban data = dao.get(request);
+			if (data == null) {
+				throw new Exception("작업내용이 없습니다.");
+			}
+			// 첨부파일 
+			ArrayList<FileInfo> attachFiles = dao.getAttachFiles();
+			
+			request.setAttribute("data", data);
+			request.setAttribute("attachFiles", attachFiles);
+			
+		} catch (Exception e) {
+			out.printf("<script>alert('%s');history.back();</script>", e.getMessage());
+			return;
+		}
+		RequestDispatcher rd = request.getRequestDispatcher("/views/kanban/view.jsp");
+		rd.include(request, response);
 	}
 }
 
