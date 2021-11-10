@@ -26,7 +26,6 @@ public class ViewController extends HttpServlet {
 			return;
 		}
 		
-		
 		BlogDao dao = new BlogDao();
 		int idx = Integer.parseInt(request.getParameter("idx"));
 		Blog blog = dao.get(idx);

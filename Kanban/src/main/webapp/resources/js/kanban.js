@@ -41,6 +41,9 @@ function callbackAddPopup()
 			delFileForm();
 		}, false);
 	}
+	
+	/** 파일 삭제 처리(수정) */
+	callbackWorkView();
 }
 
 /** 파일 첨부 추가 */
@@ -51,6 +54,7 @@ function addFileForm() {
 		const addRows = file.cloneNode(true);
 		const cnt = fileUpload.childElementCount + 1;
 		addRows.firstElementChild.name = "file" + cnt;
+		addRows.firstElementChild.value = "";
 		
 		fileUpload.appendChild(addRows);
 	}

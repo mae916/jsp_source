@@ -32,6 +32,7 @@ public class KanbanController extends HttpServlet {
 		}
 		
 		out = response.getWriter();
+		
 		switch(mode) {
 			case "work" : // 작업목록
 				workController(request, response);
@@ -47,6 +48,9 @@ public class KanbanController extends HttpServlet {
 				break;
 			case "view" : // 작업 상세보기
 				viewController(request, response);
+				break;
+			case "list" : // 작업 구분별 리스트 
+				listController(request, response);
 				break;
 			default : // 없는 페이지 
 				RequestDispatcher rd = request.getRequestDispatcher("/views/error/404.jsp");
@@ -86,6 +90,7 @@ public class KanbanController extends HttpServlet {
 			}
 			
 		} else { // 등록 양식
+			request.setAttribute("mode", "add");
 			request.setAttribute("gid", System.currentTimeMillis());
 			
 			RequestDispatcher rd = request.getRequestDispatcher("/views/kanban/form.jsp");
@@ -95,9 +100,37 @@ public class KanbanController extends HttpServlet {
 	
 	/** 작업 수정 */
 	private void editController(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		KanbanDao dao = KanbanDao.getInstance();
 		if (httpMethod.equals("POST")) { // 수정 처리
+			try {
+				boolean result = dao.edit(request);
+				if (!result) {
+					throw new Exception("수정에 실패하였습니다.");
+				}
+				out.print("<script>parent.location.reload();</script>");
+			} catch (Exception e) {
+				out.printf("<script>alert('%s');</script>", e.getMessage());
+			}
+		} else { // 수정 양식
+			try {
+				if (request.getParameter("idx") == null) {
+					throw new Exception("잘못된 접근입니다.");
+				}
+				
+				Kanban data = dao.get(request);
+				if (data == null) {
+					throw new Exception("작업내용이 없습니다.");
+				}
+				ArrayList<FileInfo> attachFiles = dao.getAttachFiles();
+				
+				request.setAttribute("mode", "edit");
+				request.setAttribute("data", data);
+				request.setAttribute("attachFiles", attachFiles);
+			} catch (Exception e) {
+				out.printf("<script>alert('%s');layer.close();</script>", e.getMessage());
+				return;
+			}
 			
-		} else { // 수정 양식 
 			RequestDispatcher rd = request.getRequestDispatcher("/views/kanban/form.jsp");
 			rd.include(request, response);
 		}
@@ -144,6 +177,31 @@ public class KanbanController extends HttpServlet {
 			return;
 		}
 		RequestDispatcher rd = request.getRequestDispatcher("/views/kanban/view.jsp");
+		rd.include(request, response);
+	}
+	
+	/**
+	 * 작업 구분별 목록 출력 
+	 * 
+	 * @param request
+	 * @param response
+	 * @throws ServletException
+	 * @throws IOException
+	 */
+	private void listController(HttpServletRequest request, HttpServletResponse response)  throws ServletException, IOException {
+		try {
+			if (request.getParameter("status") == null) {
+				throw new Exception("잘못된 접근입니다.");
+			}
+			
+			KanbanDao dao = KanbanDao.getInstance();
+			ArrayList<Kanban> list = dao.getList(request);
+			request.setAttribute("list", list);
+		} catch (Exception e) {
+			out.printf("<script>alert('%s');history.back();</script>", e.getMessage());
+			return;
+		}
+		RequestDispatcher rd = request.getRequestDispatcher("/views/kanban/main.jsp");
 		rd.include(request, response);
 	}
 }

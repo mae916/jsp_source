@@ -49,11 +49,11 @@
 		<filter-class>com.filter.CommonFilter</filter-class>
 		<init-param>
 			<param-name>NaverClientId</param-name>
-			<param-value>xnLcz5tulL1JdPH1_V5D</param-value>
+			<param-value>hluYHFpvBPSPCOQOGO4Q</param-value>
 		</init-param>
 		<init-param>
 			<param-name>NaverClientSecret</param-name>
-			<param-value>xFihj7qxhw</param-value>
+			<param-value>y6Ha_oXowD</param-value>
 		</init-param>
 		<init-param>
 			<param-name>NaverCallbackURL</param-name>
@@ -73,7 +73,7 @@
 		</init-param>
 		<init-param>
 			<param-name>DBPass</param-name>
-			<param-value>y10l10!8</param-value>
+			<param-value>aA!12345</param-value>
 		</init-param>
 	</filter>
 	<filter-mapping>

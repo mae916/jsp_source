@@ -2,6 +2,7 @@ package com.models.kanban;
 
 import java.util.*;
 import javax.servlet.http.*;
+import javax.servlet.*;
 
 import com.core.*;
 import com.models.member.*;
@@ -11,6 +12,7 @@ public class KanbanDao {
 	
 	private static KanbanDao instance = new KanbanDao();
 	private ArrayList<FileInfo> attachFiles = null; // 첨부파일 목록
+	private static HttpServletRequest request;
 	
 	private KanbanDao() {};
 	
@@ -20,6 +22,12 @@ public class KanbanDao {
 		}
 		
 		return instance;
+	}
+	
+	public static void init(ServletRequest request) {
+		if (request instanceof HttpServletRequest) {
+			KanbanDao.request = (HttpServletRequest)request;
+		}
 	}
 	
 	/**
@@ -33,19 +41,8 @@ public class KanbanDao {
 		HashMap<String, String> params = FileUpload.getInstance().upload(request).get();
 		
 		/** 유효성 검사 S */
-		String[] required = {
-				"status//작업구분을 선택하세요",
-				"subject//제목을 입력하세요.",
-				"content//작업내용을 입력하세요",
-		};
-		for (String s : required) {
-			String[] param = s.split("//");
-			String value = params.get(param[0]);
-			if (value == null || value.trim().equals("")) {
-				throw new Exception(param[1]);
-			}
-		}
-		/** 유혀성 검사 E */
+		checkWorkData(params);
+		/** 유효성 검사 E */
 		
 		int memNo = 0;
 		if (request.getAttribute("member") != null) {
@@ -67,16 +64,81 @@ public class KanbanDao {
 	}
 	
 	/**
+	 * 작업 수정 처리 
+	 * 
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	public boolean edit(HttpServletRequest request) throws Exception {
+		
+		HashMap<String, String> params = FileUpload.getInstance().upload(request).get();
+				
+		/** 유효성 검사 S */
+		if (params.get("idx") == null) {
+			throw new Exception("잘못된 접근입니다.");
+		}
+		
+		checkWorkData(params);
+		/** 유효성 검사 E */
+		
+		String sql = "UPDATE worklist SET status = ?, subject = ?, content = ?, modDt = NOW() WHERE idx = ?";
+		ArrayList<DBField> bindings = new ArrayList<>();
+		bindings.add(DB.setBinding("String", params.get("status")));
+		bindings.add(DB.setBinding("String", params.get("subject")));
+		bindings.add(DB.setBinding("String", params.get("content")));
+		bindings.add(DB.setBinding("Integer", params.get("idx")));
+		
+		int rs = DB.executeUpdate(sql, bindings);
+		return (rs >0)?true:false;
+	}
+	
+	/**
+	 * 작업 추가, 수정시 데이터 검증 
+	 * 
+	 * @param params
+	 * @throws Exception
+	 */
+	public void checkWorkData(HashMap<String, String> params) throws Exception {
+		String[] required = {
+				"status//작업구분을 선택하세요",
+				"subject//제목을 입력하세요.",
+				"content//작업내용을 입력하세요",
+		};
+		for (String s : required) {
+			String[] param = s.split("//");
+			String value = params.get(param[0]);
+			if (value == null || value.trim().equals("")) {
+				throw new Exception(param[1]);
+			}
+		}
+	}
+	/**
 	 * 작업 목록 조회 
 	 * 
 	 * @param status
 	 * @return
 	 */
-	public ArrayList<Kanban> getList(String status) {
+	public ArrayList<Kanban> getList(Object object) {
+		String status = null;
+		if (object instanceof HttpServletRequest) {
+			HttpServletRequest req = (HttpServletRequest)object;
+			status = req.getParameter("status");
+		} else {
+			status = (String)object;
+		}
+		
+		int memNo = 0;
+		if (request.getAttribute("member") != null) {
+			Member member = (Member)request.getAttribute("member");
+			memNo = member.getMemNo();
+		}
+		
 		ArrayList<DBField> bindings = new ArrayList<>();
-		String sql = "SELECT a.*, b.memId, b.memNm FROM worklist a LEFT JOIN member b ON a.memNo = b.memNo";
+		String sql = "SELECT a.*, b.memId, b.memNm FROM worklist a LEFT JOIN member b ON a.memNo = b.memNo WHERE a.memNo = ?";
+		bindings.add(DB.setBinding("Integer", String.valueOf(memNo)));
 		if (status != null) {
-			sql += " WHERE a.status = ?";
+			sql += " AND a.status = ?";
 			bindings.add(DB.setBinding("String", status));
 		}
 		
@@ -86,7 +148,7 @@ public class KanbanDao {
 		
 		return list;
 	}
-	
+		
 	public ArrayList<Kanban> getList() {
 		return getList(null);
 	}
