@@ -27,33 +27,23 @@ public class AccessController {
 	 * 페이지별 접속 체크 
 	 * @param request
 	 */
-	public static void init(ServletRequest request, ServletResponse response) throws IOException {
-		try {
-			if (request instanceof HttpServletRequest) {
-				HttpServletRequest req = (HttpServletRequest)request;
-				requestURI = req.getRequestURI();
-				isLogin = MemberDao.isLogin(request);
-				AccessController.response = response; 
-				rootURL = (String)request.getAttribute("rootURL");
-				
-				// 비회원 전용 URI 체크 
-				checkGuestOnly();
-				
-				// 메인페이지 접속 체크 
-				checkMainPage();
-				
-				// 회원 전용 URI 체크
-				checkMemberOnly();
-				
-			}
-			
-		} catch (Exception e) {
-			Logger.log(e);
-			
-			response.setContentType("text/html; charset=utf-8");
-			PrintWriter out = response.getWriter();
-			out.printf("<script>alert('%s');history.back();</script>", e.getMessage());
-		}
+	public static void init() throws IOException {
+		HttpServletRequest request = Request.get();
+		HttpServletResponse response = Response.get();
+
+		requestURI = request.getRequestURI();
+		isLogin = MemberDao.isLogin();
+		AccessController.response = response; 
+		rootURL = (String)request.getAttribute("rootURL");
+		
+		// 비회원 전용 URI 체크 
+		checkGuestOnly();
+		
+		// 메인페이지 접속 체크 
+		checkMainPage();
+		
+		// 회원 전용 URI 체크
+		checkMemberOnly();
 	}
 	
 	/**
@@ -67,7 +57,7 @@ public class AccessController {
 		 */
 		if (isLogin) {
 			for(String URI : guestOnlyURI) {
-				if (requestURI.indexOf(URI) != -1) { // 비회원 전용 페이지 접근한 경우 
+				if (requestURI.indexOf(URI) != -1 && requestURI.indexOf("/resources") == -1) { // 비회원 전용 페이지 접근한 경우 
 					throw new Exception("접근권한이 없습니다.");
 				}
 			}
@@ -95,7 +85,7 @@ public class AccessController {
 		/** 로그인 하지 않았을때 접속 하면 X */
 		if (!isLogin) {
 			for (String URI : memberOnlyURI) {
-				if (requestURI.indexOf(URI) != -1) { // 비회원이 회원전용 URI에 접속 
+				if (requestURI.indexOf(URI) != -1 && requestURI.indexOf("/resources") == -1) { // 비회원이 회원전용 URI에 접속 
 					throw new Exception("회원 전용 페이지 입니다.");
 				}
 			}

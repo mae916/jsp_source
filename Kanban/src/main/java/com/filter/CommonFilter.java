@@ -27,15 +27,17 @@ public class CommonFilter implements Filter {
 	}
 	
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws ServletException, IOException {
+		Request.set(request);
+		Response.set(response);
+		
 		/** 사이트 설정 초기화 */
-		Config.init(request);
 		Config config = Config.getInstance();
 		
 		/** 로거 초기화 */
 		Logger.init();
 		
 		/** 접속자 정보 로그 */
-		Logger.log(request);
+		Logger.log();
 		
 		/** URI별 추가 CSS */
 		request.setAttribute("addCss", config.getCss());
@@ -79,17 +81,10 @@ public class CommonFilter implements Filter {
 		}
 		
 		/** 로그인 유지 */
-		MemberDao.init(request);
+		MemberDao.init();
 		
 		/** URL 접속 권한 체크 */
-		AccessController.init(request, response);
-		
-		/** 파일 정보 초기 설정 */
-		FileInfo.init(request);
-		
-		
-		/** KanbanDao */
-		KanbanDao.init(request);
+		AccessController.init();
 		
 		// 헤더 출력
 		if (isPrintOk(request)) {
@@ -101,7 +96,7 @@ public class CommonFilter implements Filter {
 		// 푸터 출력
 		if (isPrintOk(request)) {
 			printFooter(request, response);
-		}
+		}	
 	}
 	
 	/** 
