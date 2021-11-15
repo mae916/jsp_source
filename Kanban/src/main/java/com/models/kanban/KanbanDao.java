@@ -22,7 +22,7 @@ public class KanbanDao {
 		}
 		
 		if (request == null) {
-			request = Request.get();
+			request = Req.get();
 		}
 		
 		return instance;
@@ -34,7 +34,7 @@ public class KanbanDao {
 	 * @param request
 	 * @return
 	 */
-	public boolean add() throws Exception {
+	public boolean add(HttpServletRequest request) throws Exception {
 	
 		HashMap<String, String> params = FileUpload.getInstance().upload(request).get();
 		
@@ -68,8 +68,7 @@ public class KanbanDao {
 	 * @return
 	 * @throws Exception
 	 */
-	public boolean edit() throws Exception {
-		
+	public boolean edit(HttpServletRequest request) throws Exception {
 		HashMap<String, String> params = FileUpload.getInstance().upload(request).get();
 				
 		/** 유효성 검사 S */
@@ -119,13 +118,14 @@ public class KanbanDao {
 	 */
 	public ArrayList<Kanban> getList(Object object) {
 		String status = null;
+		HttpServletRequest request = Req.get();
 		if (object instanceof HttpServletRequest) {
-			HttpServletRequest req = (HttpServletRequest)object;
-			status = req.getParameter("status");
+			request = (HttpServletRequest)object;
+			status = request.getParameter("status");
 		} else {
 			status = (String)object;
 		}
-		
+		System.out.println("member : " + request.getAttribute("member"));
 		int memNo = 0;
 		if (request.getAttribute("member") != null) {
 			Member member = (Member)request.getAttribute("member");
@@ -173,7 +173,7 @@ public class KanbanDao {
 		return data;
 	}
 	
-	public Kanban get() {
+	public Kanban get(HttpServletRequest request) {
 		int idx = 0;
 		if (request.getParameter("idx") != null) {
 			idx = Integer.valueOf(request.getParameter("idx"));
@@ -221,12 +221,47 @@ public class KanbanDao {
 		return (rs > 0)?true:false;
 	}
 	
-	public boolean delete() {
+	public boolean delete(HttpServletRequest request) throws Exception {
 		int idx = 0;
 		if (request.getParameter("idx") != null) {
 			idx = Integer.valueOf(request.getParameter("idx"));
 		}
+		
+		/** 수정, 삭제 권한이 있는지 체크 */
+		boolean result = checkAuth(request, idx);
+		if (!result) { // 삭제 권한 없음 
+			throw new Exception("삭제 권한이 없습니다.");
+		}
+		
 		return delete(idx);
+	}
+	
+	/**
+	 * 수정, 삭제 권한 여부 체크 
+	 * @param request
+	 * @param idx
+	 * @return
+	 */
+	public boolean checkAuth(HttpServletRequest request, int idx) {
+		return true;
+		/*
+		if (!MemberDao.isLogin(request)) { // 로그인이 안된 경우 -> 권한 없음
+			return false;
+		}
+		
+		HttpSession session = request.getSession();
+		
+		if (session.getAttribute("member") == null) {
+			return false;
+		}
+		Member member = (Member)session.getAttribute("member");
+		Kanban data = get(idx);
+		int memNo = member.getMemNo();
+		if (data != null && memNo == data.getMemNo()) {
+			return true; // 수정, 삭제권한 있음..
+		}
+		return false;
+		*/
 	}
 }
 

@@ -67,8 +67,7 @@ public abstract class SocialLogin {
 	 * @param request
 	 * @return
 	 */
-	public static Member getSocialMember() {
-		HttpServletRequest request = Request.get();
+	public static Member getSocialMember(HttpServletRequest request) {
 		Member socialMember = null;
 		HttpSession session = request.getSession();
 		for (String type : socialTypes) {
@@ -87,7 +86,7 @@ public abstract class SocialLogin {
 	 * @return
 	 */
 	public static SocialLogin getSocialInstance() {
-		Member member = getSocialMember();
+		Member member = getSocialMember(Req.get());
 		String type = "none";
 		SocialLogin instance = null;
 		if (member != null) {
@@ -109,7 +108,7 @@ public abstract class SocialLogin {
 	 * @param request
 	 */
 	public static void clear() {
-		HttpSession session = Request.get().getSession();
+		HttpSession session = Req.get().getSession();
 		for (String type : socialTypes) {
 			session.removeAttribute(type + "_member");
 		}
