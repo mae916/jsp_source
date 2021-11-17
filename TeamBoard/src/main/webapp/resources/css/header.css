@@ -1,0 +1,57 @@
+/** 메인 페이지 상단 */
+
+.main_top .inner {
+	height: 70px;
+	display: flex;
+	align-items: center;
+	justify-content: end;
+}
+
+.main_top .inner a:first-child {
+	margin-right: 0.5rem;
+}
+
+nav {
+	background-color: black;
+}
+
+nav .nav_list .box {
+	text-align: center;
+	width:calc(100%/8);
+}
+
+nav .show-bar li {
+	margin-top: 5px;
+}
+
+nav .show-bar a:hover {
+	border-bottom: 1px solid #E0AC47;
+	color: #E0AC47;
+}
+
+.border_bottom {
+	height: 1px;
+	background-color: rgb(39, 39, 39);
+}
+
+.border_bottom_each {
+	height: 3px;
+	background-color: #E0AC47;
+}
+
+nav .nav_over {
+	display: block;
+	height: 90px;
+	line-height: 90px;
+}
+
+nav .nav_list {
+	display: flex;
+	flex-direction: row;
+}
+nav .show-bar {
+	display: flex;
+	flex-direction: column;
+	height: 230px;
+	padding-top: 30px;
+}
