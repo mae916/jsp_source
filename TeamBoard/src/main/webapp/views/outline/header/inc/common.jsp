@@ -120,5 +120,24 @@
 		</ul>
 	</nav>
 </header>
+<!-- 배너S -->
+<div class="swiper mySwiper">
+	<div class="swiper-wrapper">
+	  <div class="swiper-slide">
+		  <img src='${rootURL}/resources/css/banner/banner0.jpeg'>
+	  </div>
+	  <div class="swiper-slide">
+		  <img src='${rootURL}/resources/css/banner/banner1.jpeg'>
+	  </div>
+	  <div class="swiper-slide">
+		  <img src='${rootURL}/resources/css/banner/banner2.jpeg'>
+	  </div>
+	  <div class="swiper-slide">
+		  <img src='${rootURL}/resources/css/banner/banner3.jpeg'>
+	  </div>
+	</div>
+	<div class="swiper-pagination"></div>
+</div>
+<!-- 배너E -->
 
 

@@ -26,6 +26,7 @@
 		<link rel="stylesheet" type="text/css" href="${rootURL}/resources/css/common.css${version}" />
 		<link rel="stylesheet" type="text/css" href="${rootURL}/resources/css/header.css${version}" />
 		<link rel="stylesheet" type="text/css" href="${rootURL}/resources/css/footer.css${version}" />
+		<link rel="stylesheet" type="text/css" href="${rootURL}/resources/css/view.css${version}" />
 		<c:forEach var="css" items="${addCss}">
 		<link rel="stylesheet" type="text/css" href="${rootURL}/resources/css/${css}.css${version}" />
 		</c:forEach>

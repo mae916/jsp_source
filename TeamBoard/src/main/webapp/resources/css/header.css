@@ -11,10 +11,6 @@ header {
 	justify-content: end;
 }
 
-/* .main_top .inner a:first-child {
-	margin-right: 0.5rem;
-} */
-
 .islogin {
 	border: 1px solid #f9930e;
 	width: 152px;
@@ -86,8 +82,6 @@ nav .show-bar {
 	width: 100%;
 	background-color: black;
 	left: 0;
-	/* position: absolute;
-	z-index: 100; */
 }
 
 nav .show-bar a:hover {
@@ -105,9 +99,10 @@ nav .nav_list {
 	display: flex;
 	flex-direction: row;
 	position: relative;
+	margin: 0 auto;
 }
 
-/* js 추가 class */
+/* js addClass */
 
 .border_bottom {
 	height: 1px;
@@ -115,24 +110,18 @@ nav .nav_list {
 }	
 
 .inner-bar {
-	position: absolute	;
-	top: 90px;
 	display: none;
+	position: absolute;
+	top: 90px;
 	height: 3px;
 	background-color: #E0AC47;
 }
 
 .on {
-	display: block !important;
+	display: block;
 }
 
 .fixed-nav {
 	position: fixed; 
-	top:0px;
+	top: 0px;
 }
-
-/* .z-index_top {
-	left: 0;
-	position: absolute;
-	z-index: 100;
-} */
