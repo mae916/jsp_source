@@ -1,0 +1,16 @@
+/* 게시글 상단 */
+.head_tit {
+    height: 70px;
+    background-color: black;
+    color: white;
+    line-height: 68px;
+    padding-left: 30px;
+}
+
+.info_head,
+.info_head dl {
+    display: flex;
+    
+}
+
+
