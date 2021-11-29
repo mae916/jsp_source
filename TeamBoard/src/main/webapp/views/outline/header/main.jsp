@@ -36,8 +36,8 @@
 		<script type="text/javascript" src="${rootURL}/resources/js/layer.js${version}"></script>
 		<script type="text/javascript" src="${rootURL}/resources/js/common.js${version}"></script>
 		<script type="text/javascript" src="${rootURL}/resources/js/header.js${version}"></script>
-		<script type="text/javascript" src="${rootURL}/resources/js/banner.js${version}"></script>
-		<script type="text/javascript" src="${rootURL}/resources/js/paging.js${version}"></script>
+		<script type="text/javascript" src="${rootURL}/resources/js/banner.js${version}"></script>			
+		<script type="text/javascript" src="${rootURL}/resources/js/view.js${version}"></script>			
 		<c:forEach var="script" items="${addScripts}">
 		<script type="text/javascript" src="${rootURL}/resources/js/${script}.js${version}"></script>
 		</c:forEach>
