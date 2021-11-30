@@ -4,7 +4,7 @@ $(function() {
     $(".box").mouseover(function () {
       const idx = $(this).index();
       const boxW = $(this).width();
-      const offsetL = (boxW * (idx - 1)); // 해당 인덱스 번호까지의 너비
+      const offsetL = (boxW * (idx - 1)); // mouseover된 해당 인덱스의 너비
         $(".inner-bar").addClass("on").stop().animate({'width':boxW, 'left': offsetL}, 230);
         //transition 효과추가?
       });
@@ -23,14 +23,14 @@ $(function() {
       $(".show-bar").hide();
     });
 
-        const navOffset = $( 'nav' ).offset();
-        $( window ).scroll( function() {
-          if ( $( window ).scrollTop() > navOffset.top ) {
-            $( 'nav' ).addClass( 'fixed-nav' );
-          }
-          else {
-            $( 'nav' ).removeClass( 'fixed-nav' );
-          }
-        });
+    const navOffset = $( 'nav' ).offset();
+    $( window ).scroll( function() {
+      if ( $( window ).scrollTop() > navOffset.top ) {
+        $( 'nav' ).addClass( 'fixed-nav' );
+      }
+      else {
+        $( 'nav' ).removeClass( 'fixed-nav' );
+      }
+    });
         
 });
